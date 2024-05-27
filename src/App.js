@@ -34,7 +34,7 @@ function Result({ correct, totalQuestions }) {
   return (
     <div className="result">
       <img
-        src="https://cdn-icons-png.flaticon.com/512/2278/2278992.png"
+        src="https://art.kartinkof.club/uploads/posts/2023-07/thumbs/1688918091_art-kartinkof-club-p-anime-art-paren-i-devushka-potselui-62.jpg"
         alt="Result icon"
       />
       <h2>Вы отгадали {correct} ответа из {totalQuestions}</h2>
