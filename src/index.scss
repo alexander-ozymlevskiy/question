@@ -95,7 +95,7 @@ body {
 
   h1 {
     margin: 0;
-    background-color: #fafafa;
+    background-color: rgba(255, 255, 255, 0.3);
     border-radius: 15px; 
     color: rgb(0, 0, 0);
     padding: 10px; 
@@ -110,7 +110,7 @@ body {
         padding: 15px;
         border: 2px solid rgba(0, 0, 0, 0.1);
         border-radius: 15px;
-        background-color: rgba(255, 255, 255, 0.5); /* Полупрозрачный белый фон */
+        background-color: rgba(255, 255, 255, 0.3); /* Полупрозрачный белый фон */
         margin-bottom: 10px;
         color: rgb(0, 0, 0);
         font-size: 15px;
