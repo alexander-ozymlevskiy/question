@@ -1,86 +1,70 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './index.scss';
-
-const questions = [
-  {
-    title: 'аа я тебя люблю',
-    variants: ['мг', 'ичо', 'и я люблю сашк'],
-    correct: 2,
-  },
-  {
-    title: 'Кого я люблю больше всего на свете ... ? ',
-    variants: ['меня', 'правилный ответ-1', 'прочитай ответ-2'],
-    correct: 0,
-  },
-  {
-    title: 'Вместе навсегда ?',
-    variants: [
-      'хзхз',
-      'дад',
-      'ни',
-    ],
-    correct: 1,
-  },
-  {
-    title: 'Умничка моя, я тебя люблю<3',
-    variants: [
-      'и я тебя люблю',
-    ],
-    correct: 0,
-  },
-];
-
-function Result({ correct, totalQuestions }) {
-  return (
-    <div className="result">
-      <img
-        src="https://art.kartinkof.club/uploads/posts/2023-07/thumbs/1688918091_art-kartinkof-club-p-anime-art-paren-i-devushka-potselui-62.jpg"
-        alt="Result icon"
-      />
-      <h2>Вы отгадали {correct} ответа из {totalQuestions}</h2>
-      <button onClick={() => window.location.reload()}>Попробовать снова</button>
-    </div>
-  );
-}
-
-function Game({ step, question, onClickVariant }) {
-  const percentage = Math.round((step / questions.length) * 100);
-
-  return (
-    <>
-      <div className="progress">
-        <div style={{ width: `${percentage}%` }} className="progress__inner"></div>
-      </div>
-      <h1>{question.title}</h1>
-      <ul>
-        {question.variants.map((text, index) => (
-          <li onClick={() => onClickVariant(index)} key={text}>
-            {text}
-          </li>
-        ))}
-      </ul>
-    </>
-  );
-}
+import StartScreen from './components/StartScreen';
+import Result from './components/Result';
+import Game from './components/Game';
+import questions from './data/questions';
 
 function App() {
-  const [step, setStep] = React.useState(0);
-  const [correct, setCorrect] = React.useState(0);
-  const question = questions[step];
+  const [step, setStep] = useState(0);
+  const [correct, setCorrect] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState(null);
+  const [isCorrect, setIsCorrect] = useState(null);
+  const [hasStarted, setHasStarted] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(600); // 10 минут в секундах
+  const [timeIsUp, setTimeIsUp] = useState(false);
+
+  useEffect(() => {
+    if (hasStarted && timeLeft > 0) {
+      const timer = setTimeout(() => {
+        setTimeLeft(timeLeft - 1);
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    } else if (hasStarted && timeLeft === 0) {
+      setTimeIsUp(true);
+    }
+  }, [hasStarted, timeLeft]);
 
   const onClickVariant = (index) => {
-    console.log(step, index);
-    setStep(step + 1);
+    if (timeIsUp) return;
 
-    if (index === question.correct) {
+    setSelectedAnswer(index);
+    const isAnswerCorrect = index === questions[step].correct;
+    setIsCorrect(isAnswerCorrect);
+    if (isAnswerCorrect) {
       setCorrect(correct + 1);
     }
+    setTimeout(() => {
+      setStep(step + 1);
+      setSelectedAnswer(null);
+      setIsCorrect(null);
+    }, 1000);
+  };
+
+  const startQuiz = () => {
+    setHasStarted(true);
   };
 
   return (
     <div className="App">
-      {step !== questions.length ? (
-        <Game step={step} question={question} onClickVariant={onClickVariant} />
+      {!hasStarted ? (
+        <StartScreen onStart={startQuiz} />
+      ) : timeIsUp ? (
+        <div className="result">
+          <p>Нажаль, час вичерпався. Спробуйте знову.</p>
+          <button onClick={() => window.location.reload()}>Спробувати знову</button>
+        </div>
+      ) : step !== questions.length ? (
+        <Game
+          step={step}
+          question={questions[step]}
+          onClickVariant={onClickVariant}
+          selectedAnswer={selectedAnswer}
+          isCorrect={isCorrect}
+          timeLeft={timeLeft}
+          totalQuestions={questions.length}
+        />
       ) : (
         <Result correct={correct} totalQuestions={questions.length} />
       )}
